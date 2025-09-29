@@ -49,17 +49,23 @@ const client = new MercadoPagoConfig({
 });
 
 // Configurar nodemailer para serverless
+// Configurar nodemailer para serverless
 let transporter;
-try {
-  transporter = nodemailer.createTransporter({
-    service: 'gmail',
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS
-    }
-  });
-} catch (error) {
-  console.log('Nodemailer not configured:', error.message);
+if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+  try {
+    transporter = nodemailer.createTransporter({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      }
+    });
+    console.log('✅ Nodemailer configurado correctamente.');
+  } catch (error) {
+    console.error('❌ Error al configurar Nodemailer:', error.message);
+  }
+} else {
+  console.warn('⚠️  Variables de entorno para email no encontradas. El envío de emails estará deshabilitado.');
 }
 
 // Middleware de autenticación para admin
@@ -159,9 +165,9 @@ app.delete("/admin/products/:id", (req, res) => {
       if (fs.existsSync(imagePath)) {
         fs.unlinkSync(imagePath);
       }
-      
+
       delete products[productId];
-      
+
       if (writeProducts(products)) {
         res.json({ success: true, message: "Producto eliminado" });
       } else {
