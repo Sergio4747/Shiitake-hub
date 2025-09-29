@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Ganoderma Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .login-section, .admin-panel {
+            padding: 40px;
+        }
+
+        .login-form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .product-card {
+            border: 2px solid #eee;
+            border-radius: 12px;
+            padding: 20px;
+            background: #f9f9f9;
+            transition: transform 0.2s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .product-info h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .product-info p {
+            margin: 5px 0;
+            color: #666;
+        }
+
+        .product-actions {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #f5c6cb;
+        }
+
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .add-product-form {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border: 2px solid #e9ecef;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍄 Panel de Administración</h1>
+            <p>Gestiona tus productos de Ganoderma Hub</p>
+            <button class="logout-btn hidden" onclick="logout()">Cerrar Sesión</button>
+        </div>
+
+        <!-- Sección de Login -->
+        <div class="login-section" id="loginSection">
+            <form class="login-form" id="loginForm">
+                <div class="form-group">
+                    <label for="username">Usuario:</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Contraseña:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn">Iniciar Sesión</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Panel de Administración -->
+        <div class="admin-panel hidden" id="adminPanel">
+            <div id="messages"></div>
+
+            <!-- Formulario para agregar productos -->
+            <div class="add-product-form">
+                <h2>➕ Agregar Nuevo Producto</h2>
+                <form id="addProductForm" enctype="multipart/form-data">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="productName">Nombre del Producto:</label>
+                            <input type="text" id="productName" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="productPrice">Precio:</label>
+                            <input type="number" id="productPrice" name="price" step="0.01" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="productSize">Tamaño/Cantidad:</label>
+                            <input type="text" id="productSize" name="size" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="productDescription">Categoría:</label>
+                            <select id="productDescription" name="description" required>
+                                <option value="cafe">Café</option>
+                                <option value="proteine">Proteína</option>
+                                <option value="capsula">Cápsula</option>
+                                <option value="te">Té</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="productImage">Imagen del Producto:</label>
+                        <input type="file" id="productImage" name="image" accept="image/*" required>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn">Agregar Producto</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Lista de productos -->
+            <div>
+                <h2>📦 Productos Actuales</h2>
+                <div class="products-grid" id="productsGrid">
+                    <!-- Los productos se cargarán aquí -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentCredentials = null;
+
+        // Manejar login
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('/admin/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                if (response.ok) {
+                    currentCredentials = { username, password };
+                    document.getElementById('loginSection').classList.add('hidden');
+                    document.getElementById('adminPanel').classList.remove('hidden');
+                    document.querySelector('.logout-btn').classList.remove('hidden');
+                    loadProducts();
+                    showMessage('Login exitoso', 'success');
+                } else {
+                    showMessage('Credenciales incorrectas', 'error');
+                }
+            } catch (error) {
+                showMessage('Error de conexión', 'error');
+            }
+        });
+
+        // Manejar agregar producto
+        document.getElementById('addProductForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData();
+            formData.append('name', document.getElementById('productName').value);
+            formData.append('price', document.getElementById('productPrice').value);
+            formData.append('size', document.getElementById('productSize').value);
+            formData.append('description', document.getElementById('productDescription').value);
+            formData.append('image', document.getElementById('productImage').files[0]);
+            formData.append('username', currentCredentials.username);
+            formData.append('password', currentCredentials.password);
+
+            try {
+                const response = await fetch('/admin/products', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    showMessage('Producto agregado exitosamente', 'success');
+                    document.getElementById('addProductForm').reset();
+                    loadProducts();
+                } else {
+                    const error = await response.json();
+                    showMessage(error.error || 'Error al agregar producto', 'error');
+                }
+            } catch (error) {
+                showMessage('Error de conexión', 'error');
+            }
+        });
+
+        // Cargar productos
+        async function loadProducts() {
+            try {
+                const response = await fetch('/admin/products');
+                const products = await response.json();
+                
+                const grid = document.getElementById('productsGrid');
+                grid.innerHTML = '';
+
+                Object.entries(products).forEach(([id, product]) => {
+                    const productCard = document.createElement('div');
+                    productCard.className = 'product-card';
+                    productCard.innerHTML = `
+                        <img src="${product.image}" alt="${product.name}" class="product-image" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlbiBubyBkaXNwb25pYmxlPC90ZXh0Pjwvc3ZnPg=='">
+                        <div class="product-info">
+                            <h3>${product.name}</h3>
+                            <p><strong>Precio:</strong> $${product.price}</p>
+                            <p><strong>Tamaño:</strong> ${product.size}</p>
+                            <p><strong>Categoría:</strong> ${product.description}</p>
+                        </div>
+                        <div class="product-actions">
+                            <button class="btn btn-danger" onclick="deleteProduct('${id}')">Eliminar</button>
+                        </div>
+                    `;
+                    grid.appendChild(productCard);
+                });
+            } catch (error) {
+                showMessage('Error al cargar productos', 'error');
+            }
+        }
+
+        // Eliminar producto
+        async function deleteProduct(id) {
+            if (!confirm('¿Estás seguro de que quieres eliminar este producto?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/admin/products/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(currentCredentials)
+                });
+
+                if (response.ok) {
+                    showMessage('Producto eliminado exitosamente', 'success');
+                    loadProducts();
+                } else {
+                    const error = await response.json();
+                    showMessage(error.error || 'Error al eliminar producto', 'error');
+                }
+            } catch (error) {
+                showMessage('Error de conexión', 'error');
+            }
+        }
+
+        // Cerrar sesión
+        function logout() {
+            currentCredentials = null;
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('adminPanel').classList.add('hidden');
+            document.querySelector('.logout-btn').classList.add('hidden');
+            document.getElementById('loginForm').reset();
+            showMessage('Sesión cerrada', 'success');
+        }
+
+        // Mostrar mensajes
+        function showMessage(message, type) {
+            const messagesDiv = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type === 'success' ? 'success-message' : 'error-message';
+            messageDiv.textContent = message;
+            messagesDiv.innerHTML = '';
+            messagesDiv.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+{
+    "1": {
+        "name": "SHIITAKE 3 EN 1 LITE",
+        "price": 0.99,
+        "size": "20 Sobres",
+        "description": "cafe",
+        "image": "img/shitaake3en1lite.png"
+    },
+    "2": {
+        "name": "MELENA DE LEON",
+        "price": 121,
+        "size": "20 Sobres",
+        "description": "cafe",
+        "image": "img/melena.webp"
+    },
+    "3": {
+        "name": "BLACKCOFFE",
+        "price": 0.99,
+        "size": "20 Sobres",
+        "description": "cafe",
+        "image": "img/blackcoffe.jpg"
+    },
+    "4": {
+        "name": "SPIRULINA EN CAPSULA",
+        "price": 0.99,
+        "size": "30 Capsulas",
+        "description": "cafe",
+        "image": "img/spiruline.webp"
+    },
+    "5": {
+        "name": "ALOE VITA",
+        "price": 0.99,
+        "size": "1kg",
+        "description": "proteine",
+        "image": "img/aloevita.png"
+    },
+    "6": {
+        "name": "LEMONZHI",
+        "price": 0.99,
+        "size": "1kg",
+        "description": "proteine",
+        "image": "img/LEMONZHI.webp"
+    }
+}

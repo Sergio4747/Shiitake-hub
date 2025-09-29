@@ -1,0 +1,25 @@
+{
+  "name": "ganoderma-hub",
+  "version": "1.0.0",
+  "description": "Tienda online de productos Ganoderma con panel de administración",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "build": "echo 'No build step required'"
+  },
+  "keywords": ["ganoderma", "tienda", "ecommerce", "nodejs"],
+  "author": "Tu Nombre",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0",
+    "mercadopago": "^2.9.0",
+    "multer": "^2.0.2",
+    "nodemailer": "^7.0.6"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
