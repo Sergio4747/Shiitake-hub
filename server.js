@@ -29,14 +29,19 @@ const client = new MercadoPagoConfig({
   accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN
 });
 
-// Configurar nodemailer
-const transporter = nodemailer.createTransporter({
-  service: 'gmail', // Puedes cambiar por otro servicio
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
-});
+// Configurar nodemailer para serverless
+let transporter;
+try {
+  transporter = nodemailer.createTransporter({
+    service: 'gmail',
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS
+    }
+  });
+} catch (error) {
+  console.log('Nodemailer not configured:', error.message);
+}
 
 // Middleware de autenticación para admin
 const authenticateAdmin = (req, res, next) => {
@@ -185,6 +190,10 @@ app.post("/send-whatsapp-notification", (req, res) => {
 // Endpoint para enviar email de confirmación
 app.post("/send-confirmation-email", async (req, res) => {
   try {
+    if (!transporter) {
+      return res.status(500).json({ error: "Email service not configured" });
+    }
+    
     const { buyerData, cartItems, total } = req.body;
     
     // Crear HTML del email
