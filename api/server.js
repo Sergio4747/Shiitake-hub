@@ -5,7 +5,7 @@ const bodyParser = require("body-parser");
 const fs = require("fs");
 const path = require("path");
 const multer = require("multer");
-const nodemailer = require("nodemailer");
+const nodemailer = require('nodemailer');
 const { MercadoPagoConfig, Preference } = require("mercadopago");
 
 const app = express();
@@ -49,7 +49,7 @@ const client = new MercadoPagoConfig({
 });
 
 // Configurar nodemailer para serverless
-// Configurar nodemailer para serverless
+
 let transporter;
 if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
   try {
