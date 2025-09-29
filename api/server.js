@@ -81,10 +81,22 @@ const authenticateAdmin = (req, res, next) => {
 // Función para leer productos
 const readProducts = () => {
   try {
-    const data = fs.readFileSync(path.join(__dirname, '..', 'products.json'), 'utf8');
-    return JSON.parse(data);
+    const filePath = path.join(__dirname, '..', 'products.json');
+    console.log('📂 Intentando leer archivo de productos en:', filePath);
+    
+    // Verificar si el archivo existe
+    if (!fs.existsSync(filePath)) {
+      console.error('❌ El archivo products.json NO existe en la ruta:', filePath);
+      return {};
+    }
+    
+    console.log('✅ Archivo products.json encontrado');
+    const data = fs.readFileSync(filePath, 'utf8');
+    const products = JSON.parse(data);
+    console.log(`📦 Productos cargados correctamente: ${Object.keys(products).length} productos`);
+    return products;
   } catch (error) {
-    console.error("Error al leer productos:", error);
+    console.error("❌ Error al leer productos:", error);
     return {};
   }
 };
@@ -102,14 +114,15 @@ const writeProducts = (products) => {
 
 // RUTAS DE ADMINISTRACIÓN
 
-// Login admin
 app.post("/admin/login", authenticateAdmin, (req, res) => {
   res.json({ success: true, message: "Login exitoso" });
 });
 
 // Obtener todos los productos
-app.get("/admin/products", (req, res) => {
+app.get("/api/products", (req, res) => {
+  console.log('🔍 Solicitando todos los productos...');
   const products = readProducts();
+  console.log('📤 Enviando productos:', Object.keys(products));
   res.json(products);
 });
 

@@ -966,14 +966,38 @@
 
         // Función para cargar productos desde la API
         async function loadProducts() {
+            const grid = document.getElementById('products-grid');
             try {
-                const response = await fetch('/api/products');
-                const newProducts = await response.json();
-                products = newProducts;
+                const apiUrl = '/api/products';
+                console.log('🔍 Solicitando productos a:', apiUrl);
+                const response = await fetch(apiUrl, { headers: { 'Accept': 'application/json' } });
+
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('📥 Datos recibidos de la API:', data);
+
+                // Aceptar tanto objeto como array
+                products = Array.isArray(data) ? data : data || {};
+
+                // Si es objeto, asegurarnos que tenga llaves
+                if (!Array.isArray(products) && Object.keys(products).length === 0) {
+                    console.warn('⚠️ La respuesta no contiene productos.');
+                }
+
                 generateProductGrid();
             } catch (error) {
-                console.error('Error al cargar productos:', error);
-                // Mantener productos actuales si falla la carga
+                console.error('❌ Error al cargar productos:', error);
+                if (grid) {
+                    grid.innerHTML = `
+                        <div class="col-span-3 text-center py-8">
+                            <p class="text-red-500">Error al cargar los productos. Intenta nuevamente.</p>
+                            <button onclick="loadProducts()" class="mt-4 px-4 py-2 bg-stone-800 text-white rounded">Reintentar</button>
+                        </div>
+                    `;
+                }
             }
         }
 
