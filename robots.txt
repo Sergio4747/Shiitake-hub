@@ -1,0 +1,39 @@
+User-agent: *
+Allow: /
+
+# Permitir acceso a todas las páginas principales
+Allow: /index.html
+Allow: /img/
+Allow: /css/
+Allow: /js/
+
+# Bloquear acceso a archivos sensibles
+Disallow: /admin.html
+Disallow: /.env
+Disallow: /server.js
+Disallow: /node_modules/
+Disallow: /package.json
+Disallow: /package-lock.json
+Disallow: /vercel.json
+Disallow: /.git/
+Disallow: /.gitignore
+Disallow: /products.json
+
+# Permitir bots específicos importantes
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+# Sitemap
+Sitemap: https://shiitake-hub.vercel.app/sitemap.xml
+
+# Crawl delay para evitar sobrecarga
+Crawl-delay: 1

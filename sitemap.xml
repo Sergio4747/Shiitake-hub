@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  
+  <!-- Página Principal -->
+  <url>
+    <loc>https://shiitake-hub.vercel.app/</loc>
+    <lastmod>2025-09-29</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://shiitake-hub.vercel.app/img/hero-bg.jpg</image:loc>
+      <image:title>Shiitake Hub - Productos Ganoderma Premium</image:title>
+      <image:caption>Tienda online de suplementos naturales y hongos medicinales</image:caption>
+    </image:image>
+  </url>
+  
+  <!-- Panel de Administración -->
+  <url>
+    <loc>https://shiitake-hub.vercel.app/admin.html</loc>
+    <lastmod>2025-09-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  
+  <!-- Productos Individuales -->
+  <url>
+    <loc>https://shiitake-hub.vercel.app/producto/shiitake-3-en-1-lite</loc>
+    <lastmod>2025-09-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://shiitake-hub.vercel.app/img/shitaake3en1lite.png</image:loc>
+      <image:title>Shiitake 3 en 1 Lite - Café Funcional</image:title>
+      <image:caption>Café funcional con hongos Shiitake premium para mejorar tu salud</image:caption>
+    </image:image>
+  </url>
+  
+  <url>
+    <loc>https://shiitake-hub.vercel.app/producto/melena-de-leon</loc>
+    <lastmod>2025-09-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://shiitake-hub.vercel.app/img/melena.webp</image:loc>
+      <image:title>Melena de León - Suplemento Cognitivo</image:title>
+      <image:caption>Suplemento natural para mejorar la memoria y función cerebral</image:caption>
+    </image:image>
+  </url>
+  
+  <url>
+    <loc>https://shiitake-hub.vercel.app/producto/spirulina-capsulas</loc>
+    <lastmod>2025-09-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://shiitake-hub.vercel.app/img/spiruline.webp</image:loc>
+      <image:title>Spirulina en Cápsulas - Superalimento</image:title>
+      <image:caption>Superalimento rico en proteínas, vitaminas y minerales</image:caption>
+    </image:image>
+  </url>
+  
+  <url>
+    <loc>https://shiitake-hub.vercel.app/producto/aloe-vita</loc>
+    <lastmod>2025-09-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://shiitake-hub.vercel.app/img/aloevita.png</image:loc>
+      <image:title>Aloe Vita - Suplemento Natural</image:title>
+      <image:caption>Suplemento natural de aloe vera para la salud digestiva</image:caption>
+    </image:image>
+  </url>
+  
+  <url>
+    <loc>https://shiitake-hub.vercel.app/producto/lemonzhi</loc>
+    <lastmod>2025-09-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://shiitake-hub.vercel.app/img/LEMONZHI.webp</image:loc>
+      <image:title>Lemonzhi - Bebida Energética Natural</image:title>
+      <image:caption>Bebida energética natural con limón y ganoderma</image:caption>
+    </image:image>
+  </url>
+  
+  <!-- Categorías -->
+  <url>
+    <loc>https://shiitake-hub.vercel.app/categoria/hongos-medicinales</loc>
+    <lastmod>2025-09-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://shiitake-hub.vercel.app/categoria/suplementos-naturales</loc>
+    <lastmod>2025-09-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://shiitake-hub.vercel.app/categoria/cafe-funcional</loc>
+    <lastmod>2025-09-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+</urlset>
