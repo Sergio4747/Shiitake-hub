@@ -10,7 +10,7 @@ const { MercadoPagoConfig, Preference } = require("mercadopago");
 
 const app = express();
 
-app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, '..')));
 app.use(cors());
 app.use(bodyParser.json());
 
@@ -31,7 +31,7 @@ app.get('/health', (req, res) => {
 // Configurar multer para subida de imágenes
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'img/');
+    cb(null, path.join(__dirname, '..', 'img'));
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + '-' + file.originalname);
@@ -75,16 +75,23 @@ const authenticateAdmin = (req, res, next) => {
 // Función para leer productos
 const readProducts = () => {
   try {
-    const data = fs.readFileSync('products.json', 'utf8');
+    const data = fs.readFileSync(path.join(__dirname, '..', 'products.json'), 'utf8');
     return JSON.parse(data);
   } catch (error) {
+    console.error("Error al leer productos:", error);
     return {};
   }
 };
 
 // Función para escribir productos
 const writeProducts = (products) => {
-  fs.writeFileSync('products.json', JSON.stringify(products, null, 2));
+  try {
+    fs.writeFileSync(path.join(__dirname, '..', 'products.json'), JSON.stringify(products, null, 2));
+    return true;
+  } catch (error) {
+    console.error("Error al escribir productos:", error);
+    return false;
+  }
 };
 
 // RUTAS DE ADMINISTRACIÓN
@@ -104,7 +111,7 @@ app.get("/admin/products", (req, res) => {
 app.post("/admin/products", upload.single('image'), (req, res) => {
   try {
     const { name, price, size, description, username, password } = req.body;
-    
+
     // Verificar credenciales
     if (username !== process.env.ADMIN_USERNAME || password !== process.env.ADMIN_PASSWORD) {
       return res.status(401).json({ error: "Credenciales incorrectas" });
@@ -112,9 +119,9 @@ app.post("/admin/products", upload.single('image'), (req, res) => {
 
     const products = readProducts();
     const newId = String(Math.max(...Object.keys(products).map(Number), 0) + 1);
-    
+
     const imagePath = req.file ? `img/${req.file.filename}` : '';
-    
+
     products[newId] = {
       name,
       price: parseFloat(price),
@@ -122,9 +129,12 @@ app.post("/admin/products", upload.single('image'), (req, res) => {
       description,
       image: imagePath
     };
-    
-    writeProducts(products);
-    res.json({ success: true, id: newId, product: products[newId] });
+
+    if (writeProducts(products)) {
+      res.json({ success: true, id: newId, product: products[newId] });
+    } else {
+      res.status(500).json({ error: "Error al guardar producto" });
+    }
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -134,7 +144,7 @@ app.post("/admin/products", upload.single('image'), (req, res) => {
 app.delete("/admin/products/:id", (req, res) => {
   try {
     const { username, password } = req.body;
-    
+
     // Verificar credenciales
     if (username !== process.env.ADMIN_USERNAME || password !== process.env.ADMIN_PASSWORD) {
       return res.status(401).json({ error: "Credenciales incorrectas" });
@@ -142,11 +152,21 @@ app.delete("/admin/products/:id", (req, res) => {
 
     const products = readProducts();
     const productId = req.params.id;
-    
+
     if (products[productId]) {
+      // Eliminar imagen si existe
+      const imagePath = path.join(__dirname, '..', products[productId].image);
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+      }
+      
       delete products[productId];
-      writeProducts(products);
-      res.json({ success: true, message: "Producto eliminado" });
+      
+      if (writeProducts(products)) {
+        res.json({ success: true, message: "Producto eliminado" });
+      } else {
+        res.status(500).json({ error: "Error al eliminar producto" });
+      }
     } else {
       res.status(404).json({ error: "Producto no encontrado" });
     }
@@ -165,7 +185,7 @@ app.get("/api/products", (req, res) => {
 app.post("/send-whatsapp-notification", (req, res) => {
   try {
     const { buyerData, cartItems, total } = req.body;
-    
+
     // Formatear mensaje para WhatsApp
     let message = `🛒 *NUEVA COMPRA - GANODERMA HUB*\n\n`;
     message += `👤 *DATOS DEL CLIENTE:*\n`;
@@ -175,7 +195,7 @@ app.post("/send-whatsapp-notification", (req, res) => {
     message += `• Dirección: ${buyerData.address}\n`;
     message += `• Ciudad: ${buyerData.city}\n`;
     message += `• Código Postal: ${buyerData.zip}\n\n`;
-    
+
     message += `📦 *PRODUCTOS COMPRADOS:*\n`;
     cartItems.forEach((item, index) => {
       message += `${index + 1}. ${item.name}\n`;
@@ -183,23 +203,23 @@ app.post("/send-whatsapp-notification", (req, res) => {
       message += `   • Precio unitario: $${item.price}\n`;
       message += `   • Subtotal: $${(item.price * item.quantity).toFixed(2)}\n\n`;
     });
-    
+
     message += `💰 *TOTAL: $${total}*\n\n`;
     message += `⏰ Fecha: ${new Date().toLocaleString('es-AR')}\n`;
     message += `🌐 Pedido realizado desde: Ganoderma Hub`;
-    
+
     // Crear URL de WhatsApp
     const phoneNumber = process.env.WHATSAPP_NUMBER || '5491234567890'; // Tu número
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
-    
+
     // En lugar de enviar automáticamente, devolvemos la URL para que el cliente abra WhatsApp
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       whatsappUrl: whatsappUrl,
       message: "Datos preparados para WhatsApp"
     });
-    
+
   } catch (error) {
     console.error("Error al preparar mensaje de WhatsApp:", error);
     res.status(500).json({ error: error.message });
@@ -212,9 +232,9 @@ app.post("/send-confirmation-email", async (req, res) => {
     if (!transporter) {
       return res.status(500).json({ error: "Email service not configured" });
     }
-    
+
     const { buyerData, cartItems, total } = req.body;
-    
+
     // Crear HTML del email
     let productsHTML = '';
     cartItems.forEach((item, index) => {
@@ -307,12 +327,12 @@ app.post("/send-confirmation-email", async (req, res) => {
     };
 
     await transporter.sendMail(mailOptions);
-    
-    res.json({ 
-      success: true, 
+
+    res.json({
+      success: true,
       message: "Email de confirmación enviado exitosamente"
     });
-    
+
   } catch (error) {
     console.error("Error al enviar email:", error);
     res.status(500).json({ error: error.message });
@@ -323,7 +343,7 @@ app.post("/create_preference", async (req, res) => {
   try {
     const { items, payer } = req.body;
 
-    const baseUrl = process.env.NODE_ENV === 'production' 
+    const baseUrl = process.env.NODE_ENV === 'production'
       ? process.env.VERCEL_URL || process.env.DOMAIN_URL || 'https://tu-dominio.vercel.app'
       : 'http://localhost:3000';
 
@@ -359,9 +379,16 @@ app.get("/pending", (req, res) => {
 });
 
 app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/index.html");
+  res.sendFile(path.join(__dirname, '..', 'index.html'));
 });
 
-app.listen(3000, () => {
-  console.log("Servidor escuchando en http://localhost:3000");
-});
+// Para desarrollo local
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`Servidor escuchando en http://localhost:${PORT}`);
+  });
+}
+
+// Para Vercel (serverless)
+module.exports = app;
