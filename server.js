@@ -14,6 +14,20 @@ app.use(express.static(__dirname));
 app.use(cors());
 app.use(bodyParser.json());
 
+// Endpoint de salud para debugging
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'OK',
+    timestamp: new Date().toISOString(),
+    env: {
+      NODE_ENV: process.env.NODE_ENV,
+      hasMP: !!process.env.MERCADOPAGO_ACCESS_TOKEN,
+      hasEmail: !!process.env.EMAIL_USER,
+      hasAdmin: !!process.env.ADMIN_USERNAME
+    }
+  });
+});
+
 // Configurar multer para subida de imágenes
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -25,8 +39,13 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
+// Verificar variables de entorno críticas
+if (!process.env.MERCADOPAGO_ACCESS_TOKEN) {
+  console.error('❌ MERCADOPAGO_ACCESS_TOKEN no configurado');
+}
+
 const client = new MercadoPagoConfig({
-  accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN
+  accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN || 'TEST-TOKEN'
 });
 
 // Configurar nodemailer para serverless
