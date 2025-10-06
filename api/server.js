@@ -13,8 +13,10 @@ const app = express();
 // Servir archivos estáticos desde la raíz del proyecto
 app.use(express.static(path.join(__dirname, '..')));
 
-app.use(cors());
-app.use(bodyParser.json());
+// Middleware para servir index.html en la raíz
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'index.html'));
+});
 
 // Endpoint de salud para debugging
 app.get('/health', (req, res) => {
@@ -83,18 +85,19 @@ const authenticateAdmin = (req, res, next) => {
 // Función para leer productos
 const readProducts = () => {
   try {
-    // Buscar el archivo products.json en la raíz del proyecto
-    const filePath = path.join(__dirname, '..', 'products.json');
-    console.log('📂 Intentando leer archivo de productos en:', filePath);
+    // Buscar el archivo products.json en la misma carpeta que el servidor
+    const filePath = path.join(__dirname, 'products.json');
 
     // Verificar si el archivo existe
     if (!fs.existsSync(filePath)) {
       console.error('❌ El archivo products.json NO existe en la ruta:', filePath);
+      console.log('📂 Archivos disponibles en api/:', fs.readdirSync(path.join(__dirname)));
       return {};
     }
 
     console.log('✅ Archivo products.json encontrado');
     const data = fs.readFileSync(filePath, 'utf8');
+    console.log('📦 Datos leídos, longitud:', data.length);
     const products = JSON.parse(data);
     console.log(`📦 Productos cargados correctamente: ${Object.keys(products).length} productos`);
     return products;
@@ -114,20 +117,6 @@ const writeProducts = (products) => {
     return false;
   }
 };
-
-// RUTAS DE PRODUCTOS
-
-// Obtener todos los productos
-app.get('/api/products', (req, res) => {
-  try {
-    const products = readProducts();
-    console.log('📤 Enviando productos al cliente:', Object.keys(products).length);
-    res.json(products);
-  } catch (error) {
-    console.error('❌ Error al obtener productos:', error);
-    res.status(500).json({ error: 'Error al obtener los productos' });
-  }
-});
 
 // RUTAS DE ADMINISTRACIÓN
 
@@ -205,11 +194,15 @@ app.delete("/admin/products/:id", (req, res) => {
 
 // Obtener productos para el frontend público
 app.get("/api/products", (req, res) => {
-  const products = readProducts();
-  res.json(products);
+  try {
+    const products = readProducts();
+    console.log('📤 Enviando productos al cliente:', Object.keys(products).length);
+    res.json(products);
+  } catch (error) {
+    console.error('❌ Error al obtener productos:', error);
+    res.status(500).json({ error: 'Error al obtener los productos' });
+  }
 });
-
-// Endpoint para enviar notificación por WhatsApp
 app.post("/send-whatsapp-notification", (req, res) => {
   try {
     const { buyerData, cartItems, total } = req.body;
@@ -404,10 +397,6 @@ app.get("/failure", (req, res) => {
 
 app.get("/pending", (req, res) => {
   res.redirect("/?status=pending");
-});
-
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'index.html'));
 });
 
 // Iniciar el servidor
