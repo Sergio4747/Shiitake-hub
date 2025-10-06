@@ -81,15 +81,16 @@ const authenticateAdmin = (req, res, next) => {
 // Función para leer productos
 const readProducts = () => {
   try {
-    const filePath = path.join(__dirname, '..', 'products.json');
+    // Simplemente busca el archivo en el directorio actual (__dirname)
+    const filePath = path.join(__dirname, 'products.json');
     console.log('📂 Intentando leer archivo de productos en:', filePath);
-    
+
     // Verificar si el archivo existe
     if (!fs.existsSync(filePath)) {
       console.error('❌ El archivo products.json NO existe en la ruta:', filePath);
       return {};
     }
-    
+
     console.log('✅ Archivo products.json encontrado');
     const data = fs.readFileSync(filePath, 'utf8');
     const products = JSON.parse(data);
