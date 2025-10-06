@@ -10,7 +10,9 @@ const { MercadoPagoConfig, Preference } = require("mercadopago");
 
 const app = express();
 
+// Servir archivos estáticos desde la raíz del proyecto
 app.use(express.static(path.join(__dirname, '..')));
+
 app.use(cors());
 app.use(bodyParser.json());
 
@@ -81,8 +83,8 @@ const authenticateAdmin = (req, res, next) => {
 // Función para leer productos
 const readProducts = () => {
   try {
-    // Simplemente busca el archivo en el directorio actual (__dirname)
-    const filePath = path.join(__dirname, 'products.json');
+    // Buscar el archivo products.json en la raíz del proyecto
+    const filePath = path.join(__dirname, '..', 'products.json');
     console.log('📂 Intentando leer archivo de productos en:', filePath);
 
     // Verificar si el archivo existe
