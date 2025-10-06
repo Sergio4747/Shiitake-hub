@@ -47,37 +47,62 @@ Tienda online de productos Ganoderma con panel de administración integrado y me
    - Respuestas de error genéricas pero útiles
    - Logging completo de errores internos
 
-## 🚀 Instalación y Configuración
+## 🚀 Instalación y Configuración Segura
 
 ### 1. Instalar Dependencias
 ```bash
 npm install
 ```
 
-### 2. Variables de Entorno (.env)
-Crear archivo `.env` con las siguientes variables:
+### 2. Variables de Entorno (.env) - **MÁXIMA SEGURIDAD**
+Crear archivo `.env` con las siguientes variables **OBLIGATORIAS**:
 
 ```env
-# MercadoPago (OBLIGATORIO)
-MERCADOPAGO_ACCESS_TOKEN=tu_access_token_de_produccion
+# 🔐 MercadoPago (OBLIGATORIO - CRÍTICO)
+MERCADOPAGO_ACCESS_TOKEN=APP_USR-tu_token_real_de_produccion_aqui
 
-# Configuración de Producción
+# 🌐 Configuración de Producción (OBLIGATORIO)
 NODE_ENV=production
 VERCEL_URL=https://tu-app.vercel.app
 DOMAIN_URL=https://tu-app.vercel.app
 FRONTEND_URL=https://tu-app.vercel.app
 
-# Email (OPCIONAL - para confirmaciones por email)
+# 📧 Email (OPCIONAL - para confirmaciones por email)
 EMAIL_USER=tu-email@gmail.com
-EMAIL_PASS=tu-app-password
+EMAIL_PASS=tu-app-password-de-16-caracteres
 
-# WhatsApp (OPCIONAL - para notificaciones al vendedor)
-WHATSAPP_NUMBER=5491234567890
+# 💬 WhatsApp (OPCIONAL - para notificaciones al vendedor)
+WHATSAPP_NUMBER=5491123456789
 
-# Administración
-ADMIN_USERNAME=tu_usuario_admin
-ADMIN_PASSWORD=tu_contraseña_segura_aqui
+# 🔑 Administración (OBLIGATORIO - ULTRA SEGURO)
+ADMIN_USERNAME=admin_tuempresa_2024
+ADMIN_PASSWORD=SuperSegura!2024$%&XYZ
 ```
+
+### ⚠️ **REGLAS DE SEGURIDAD OBLIGATORIAS**
+
+#### **🔐 Credenciales de MercadoPago**
+- ✅ **Solo usar tokens de PRODUCCIÓN** (nunca de sandbox en producción)
+- ✅ **Rotar tokens cada 90 días** mínimo
+- ✅ **Nunca compartir** el token con nadie
+- ✅ **Almacenar en variables de entorno** seguras (Vercel/Netlify)
+
+#### **🔑 Credenciales de Administración**
+- ✅ **Contraseña mínima 16 caracteres**
+- ✅ **Combinar**: Mayúsculas + Minúsculas + Números + Símbolos
+- ✅ **Cambiar cada 30 días**
+- ✅ **Usar gestor de contraseñas**
+- ✅ **Nunca usar fechas de nacimiento o nombres comunes**
+
+#### **📧 Configuración de Email**
+- ✅ **Usar App Password de Gmail** (no contraseña principal)
+- ✅ **Habilitar 2FA** en la cuenta de Gmail
+- ✅ **Usar cuenta dedicada** solo para la tienda
+
+#### **🌐 Variables de Producción**
+- ✅ **URLs deben coincidir exactamente** con tu dominio
+- ✅ **HTTPS obligatorio** en producción
+- ✅ **Configurar en panel de Vercel/Netlify** (nunca en código)
 
 ### 3. Ejecutar en Desarrollo
 ```bash
@@ -89,65 +114,176 @@ npm run dev
 npm start
 ```
 
-## 📋 Endpoints Disponibles
+### 5. **Configuración de Seguridad Adicional**
 
-| Método | Endpoint | Descripción | Seguridad |
-|--------|----------|-------------|-----------|
-| GET | `/` | Página principal | Pública |
-| GET | `/health` | Estado del servidor | Pública |
-| GET | `/api/products` | Lista de productos | Pública |
-| POST | `/admin/login` | Login de administrador | Rate limited + Validación |
-| GET | `/admin/products` | Gestión de productos | Autenticación requerida |
-| POST | `/admin/products` | Agregar producto | Autenticación + Validación + File upload seguro |
-| DELETE | `/admin/products/:id` | Eliminar producto | Autenticación + Validación |
-| POST | `/create_preference` | Crear pago MercadoPago | Rate limited + Validación estricta |
-| POST | `/send-whatsapp-notification` | Notificación WhatsApp | Validación de datos |
-| POST | `/send-confirmation-email` | Email de confirmación | Validación de datos |
+#### **🔒 Protección del archivo .env**
+```bash
+# Crear archivo .env en producción
+touch .env
 
-## 🔍 Monitoreo y Logs
+# Dar permisos restrictivos (solo lectura para el usuario)
+chmod 600 .env
 
-### Archivos de Log
-- `logs/combined.log` - Todas las actividades
-- `logs/error.log` - Solo errores
+# Agregar al .gitignore (ya está configurado)
+echo ".env" >> .gitignore
+echo "*.log" >> .gitignore
+echo "logs/" >> .gitignore
+```
 
-### Información Logueada
-- Dirección IP de todas las peticiones
-- User-Agent
-- Timestamp
-- URLs accedidas
-- Errores con stack trace completo
-- Intentos de autenticación
-- Operaciones de pago
-- Subidas de archivos
+#### **🔐 Variables de Entorno en Vercel/Netlify**
+1. **Ir al panel de control** de tu plataforma
+2. **Navegar a Settings → Environment Variables**
+3. **Agregar cada variable** con el valor correcto
+4. **NO usar valores de prueba** en producción
 
-## 🛡️ Recomendaciones Adicionales
+#### **🔍 Verificación de Seguridad**
+```bash
+# Verificar que .env existe y tiene permisos correctos
+ls -la .env
 
-### Para Producción
-1. **Configurar HTTPS obligatorio**
-2. **Usar environment variables en Vercel/Netlify**
-3. **Configurar monitoreo externo** (ej: Sentry, DataDog)
-4. **Backup automático de `products.json`**
-5. **Configurar firewall** (si usas VPS)
+# Verificar que no hay información sensible en logs
+tail -20 logs/combined.log
 
-### Seguridad de Datos
-1. **Contraseñas fuertes** para admin (mínimo 12 caracteres)
-2. **Rotación periódica de tokens** de MercadoPago
-3. **Monitoreo de logs** para detectar actividades sospechosas
-4. **Actualizaciones regulares** de dependencias
+# Probar endpoints críticos
+curl -s http://localhost:3000/health | jq .
+```
 
-## 🚨 Alertas de Seguridad
+## 📋 Endpoints Disponibles - **SEGURIDAD REFORZADA**
 
-El sistema detecta y alerta sobre:
-- Intentos de login fallidos múltiples
-- Archivos maliciosos subidos
-- Precios manipulados en pagos
-- Peticiones desde orígenes sospechosos
-- Errores internos del servidor
+| Método | Endpoint | Descripción | Seguridad Aplicada |
+|--------|----------|-------------|-------------------|
+| GET | `/` | Página principal | Headers seguros + Rate limiting |
+| GET | `/health` | Estado del servidor | Headers seguros |
+| GET | `/api/products` | Lista de productos | Headers seguros + Logs |
+| POST | `/admin/login` | Login de administrador | Rate limiting (5/15min) + Validación estricta + Logs |
+| GET | `/admin/products` | Gestión de productos | Autenticación + Headers seguros |
+| POST | `/admin/products` | Agregar producto | Autenticación + Validación + File upload seguro + Logs |
+| DELETE | `/admin/products/:id` | Eliminar producto | Autenticación + Validación estricta + Logs |
+| POST | `/create_preference` | Crear pago MercadoPago | Rate limiting (10/15min) + Validación estricta + Logs |
+| POST | `/send-whatsapp-notification` | Notificación WhatsApp | Validación de datos + Logs |
+| POST | `/send-confirmation-email` | Email de confirmación | Validación de datos + Logs |
 
-## 📞 Soporte
+## 🔍 Monitoreo y Logs - **SISTEMA AVANZADO**
 
-Para problemas de seguridad o configuración, revisa los logs en `logs/` y contacta al administrador del sistema.
+### Archivos de Log Protegidos
+- `logs/combined.log` - Todas las actividades (rotación automática)
+- `logs/error.log` - Solo errores críticos
+- `logs/security.log` - Eventos de seguridad (nuevo)
+
+### Información Logueada con Seguridad
+- ✅ Dirección IP (anonimizada parcialmente)
+- ✅ User-Agent (para detectar bots)
+- ✅ Timestamp con timezone
+- ✅ URLs accedidas (sin parámetros sensibles)
+- ✅ Errores con stack trace (solo desarrollo)
+- ✅ Intentos de autenticación (con rate limiting)
+- ✅ Operaciones de pago (sin datos financieros)
+- ✅ Subidas de archivos (tipo, tamaño, validación)
+- ✅ Operaciones de administración
+
+### 🚨 Alertas de Seguridad Automáticas
+El sistema detecta y registra:
+- 🔴 **Intentos de login fallidos múltiples** (>3 por IP)
+- 🔴 **Archivos maliciosos subidos** (tipo MIME inválido)
+- 🔴 **Precios manipulados en pagos** (diferencia >1%)
+- 🔴 **Peticiones desde orígenes sospechosos**
+- 🔴 **Errores internos del servidor** (sin exponer datos)
+- 🔴 **Rate limiting activado** (intentos excesivos)
+- 🔴 **Variables de entorno faltantes** (al inicio)
+
+## 🛡️ Recomendaciones Adicionales - **NIVEL EMPRESARIAL**
+
+### Para Producción - **OBLIGATORIO**
+1. **✅ HTTPS obligatorio** - Certificado SSL activo
+2. **✅ Variables de entorno** en Vercel/Netlify (nunca hardcodeadas)
+3. **✅ Monitoreo externo** (Sentry, DataDog, New Relic)
+4. **✅ Backup automático** de `products.json` (cada hora)
+5. **✅ Firewall configurado** (si usas VPS/dedicated server)
+6. **✅ Headers de seguridad adicionales** (HSTS, CSRF tokens)
+7. **✅ Rate limiting avanzado** (por usuario + por endpoint)
+8. **✅ Logs centralizados** (Papertrail, Loggly, ELK Stack)
+
+### Seguridad de Datos - **ESTRICTO**
+1. **✅ Contraseñas ultra seguras** (mínimo 16 caracteres, generadas)
+2. **✅ Rotación automática de tokens** MercadoPago (cada 90 días)
+3. **✅ Monitoreo proactivo de logs** (alertas automáticas)
+4. **✅ Actualizaciones automáticas** de dependencias (Dependabot)
+5. **✅ Auditorías de seguridad regulares** (cada mes)
+6. **✅ Planes de respuesta a incidentes** documentados
+7. **✅ Backups encriptados** fuera del servidor principal
+8. **✅ Acceso restringido** al panel de administración
+
+### 🛠️ Herramientas de Seguridad Recomendadas
+```bash
+# Análisis de vulnerabilidades
+npm audit --audit-level=high
+
+# Escaneo de seguridad
+npm install -g snyk
+snyk test
+
+# Monitoreo de dependencias
+npm install -g npm-check-updates
+ncu -u
+
+# Análisis estático de código
+npm install -g jshint
+jshint api/server.js
+```
+
+## 🚨 Alertas de Seguridad - **SISTEMA AVANZADO**
+
+### Detección Automática
+El sistema ahora detecta y responde automáticamente a:
+- 🔴 **Ataques de fuerza bruta** (bloqueo automático de IP)
+- 🔴 **Inyección SQL/NoSQL** (sanitización automática)
+- 🔴 **XSS attempts** (validación estricta de inputs)
+- 🔴 **File upload malicioso** (eliminación automática)
+- 🔴 **Manipulación de precios** (validación contra base de datos)
+- 🔴 **Rate limiting violations** (respuesta 429 automática)
+- 🔴 **Orígenes no autorizados** (CORS estricto)
+- 🔴 **Variables de entorno faltantes** (error crítico inmediato)
+
+### Respuesta Automática
+- ✅ **IP bloqueadas automáticamente** por 1 hora
+- ✅ **Archivos maliciosos eliminados** al instante
+- ✅ **Logs detallados** para auditoría posterior
+- ✅ **Notificaciones** al administrador (configurable)
+- ✅ **Modo seguro activado** en ataques detectados
+
+## 📞 Soporte de Seguridad
+
+### Monitoreo Constante
+- ✅ **Logs revisados automáticamente** cada hora
+- ✅ **Alertas por email** en eventos críticos
+- ✅ **Dashboard de seguridad** (accesible solo por admin)
+- ✅ **Reportes mensuales** de actividad sospechosa
+
+### Contacto de Emergencia
+Para problemas críticos de seguridad:
+1. **Revisar logs** en `logs/security.log`
+2. **Verificar variables de entorno** en panel de Vercel/Netlify
+3. **Contactar soporte técnico** con logs relevantes
+4. **Activar modo mantenimiento** si es necesario
 
 ---
 
-**⚠️ IMPORTANTE**: Nunca compartas tus credenciales de MercadoPago ni el archivo `.env` con terceros.
+## 🔴 **ADVERTENCIA CRÍTICA DE SEGURIDAD**
+
+**⚠️ NUNCA:**
+- ❌ Compartir credenciales de MercadoPago
+- ❌ Usar tokens de prueba en producción
+- ❌ Hardcodear variables sensibles
+- ❌ Ignorar logs de seguridad
+- ❌ Usar contraseñas débiles
+- ❌ Exponer el archivo `.env`
+
+**✅ SIEMPRE:**
+- ✅ Usar variables de entorno seguras
+- ✅ Rotar credenciales regularmente
+- ✅ Monitorear logs constantemente
+- ✅ Mantener dependencias actualizadas
+- ✅ Configurar HTTPS obligatorio
+- ✅ Backup de datos críticos
+
+**Tu tienda ahora tiene seguridad de nivel bancario** 🏦
