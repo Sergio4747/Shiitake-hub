@@ -4,8 +4,8 @@
   "description": "Tienda online de productos Ganoderma con panel de administración",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js",
+    "start": "node api/server.js",
+    "dev": "node api/server.js",
     "build": "echo 'No build step required'"
   },
   "keywords": [

@@ -53,7 +53,7 @@ const client = new MercadoPagoConfig({
 let transporter;
 if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
   try {
-    transporter = nodemailer.createTransporter({
+    transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
         user: process.env.EMAIL_USER,
@@ -112,18 +112,24 @@ const writeProducts = (products) => {
   }
 };
 
+// RUTAS DE PRODUCTOS
+
+// Obtener todos los productos
+app.get('/api/products', (req, res) => {
+  try {
+    const products = readProducts();
+    console.log('📤 Enviando productos al cliente:', Object.keys(products).length);
+    res.json(products);
+  } catch (error) {
+    console.error('❌ Error al obtener productos:', error);
+    res.status(500).json({ error: 'Error al obtener los productos' });
+  }
+});
+
 // RUTAS DE ADMINISTRACIÓN
 
 app.post("/admin/login", authenticateAdmin, (req, res) => {
   res.json({ success: true, message: "Login exitoso" });
-});
-
-// Obtener todos los productos
-app.get("/api/products", (req, res) => {
-  console.log('🔍 Solicitando todos los productos...');
-  const products = readProducts();
-  console.log('📤 Enviando productos:', Object.keys(products));
-  res.json(products);
 });
 
 // Agregar producto
@@ -401,13 +407,13 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'index.html'));
 });
 
-// Para desarrollo local
-if (process.env.NODE_ENV !== 'production') {
-  const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => {
-    console.log(`Servidor escuchando en http://localhost:${PORT}`);
-  });
-}
+// Iniciar el servidor
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Servidor escuchando en http://localhost:${PORT}`);
+  console.log('Entorno:', process.env.NODE_ENV || 'development');
+  console.log('Ruta de productos:', path.join(__dirname, '..', 'products.json'));
+});
 
 // Para Vercel (serverless)
 module.exports = app;
