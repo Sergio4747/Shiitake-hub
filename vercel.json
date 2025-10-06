@@ -2,18 +2,33 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/server.js",
-      "use": "@vercel/node"
+      "src": "api/server-vercel.js",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": ["api/**", "img/**", "!node_modules/**"]
+      }
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "api/server.js"
+      "dest": "/api/server-vercel.js"
+    },
+    {
+      "src": "/admin/(.*)",
+      "dest": "/api/server-vercel.js"
     },
     {
       "src": "/(.*)",
-      "dest": "api/server.js"
+      "dest": "/api/server-vercel.js"
     }
-  ]
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "functions": {
+    "api/server-vercel.js": {
+      "runtime": "nodejs18.x"
+    }
+  }
 }
