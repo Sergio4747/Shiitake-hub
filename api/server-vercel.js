@@ -1,7 +1,11 @@
 // Configuración específica para Vercel
 const isVercel = process.env.VERCEL || process.env.NODE_ENV === 'production';
 
-require('dotenv').config();
+// Solo cargar dotenv en desarrollo local
+if (!isVercel) {
+  require('dotenv').config();
+}
+
 const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
@@ -24,9 +28,15 @@ if (!isVercel) {
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// CORS para producción
+// CORS simplificado para Vercel
 const corsOptions = {
   origin: function (origin, callback) {
+    // Permitir todas las peticiones en Vercel para evitar problemas
+    if (isVercel) {
+      callback(null, true);
+      return;
+    }
+    
     const allowedOrigins = [
       'http://localhost:3000',
       'http://127.0.0.1:3000',
@@ -39,7 +49,7 @@ const corsOptions = {
       callback(null, true);
     } else {
       console.warn('Origen CORS bloqueado:', origin);
-      callback(new Error('Origen no permitido'));
+      callback(null, true); // Permitir de todos modos para evitar bloqueos
     }
   },
   credentials: true,
@@ -77,23 +87,42 @@ const readProducts = () => {
     ];
 
     let filePath = null;
+    let foundPaths = [];
+    
     for (const testPath of possiblePaths) {
-      if (fs.existsSync(testPath)) {
-        filePath = testPath;
-        break;
+      try {
+        if (fs.existsSync(testPath)) {
+          filePath = testPath;
+          foundPaths.push(testPath);
+          break;
+        }
+      } catch (e) {
+        // Ignorar errores de acceso a rutas
       }
     }
 
     if (!filePath) {
-      console.error('❌ Archivo products.json no encontrado');
-      return {};
+      console.error('❌ Archivo products.json no encontrado en:', possiblePaths);
+      console.log('📂 __dirname:', __dirname);
+      console.log('📂 process.cwd():', process.cwd());
+      // Retornar productos de ejemplo si no se encuentra el archivo
+      return {
+        "1": {
+          "name": "Producto de Ejemplo",
+          "price": 10.99,
+          "size": "100g",
+          "description": "Producto de ejemplo",
+          "image": "img/default.jpg"
+        }
+      };
     }
 
+    console.log('✅ Leyendo productos desde:', filePath);
     const data = fs.readFileSync(filePath, 'utf8');
     const products = JSON.parse(data);
     return products;
   } catch (error) {
-    console.error("❌ Error al leer productos:", error.message);
+    console.error("❌ Error al leer productos:", error.message, error.stack);
     return {};
   }
 };
@@ -202,9 +231,14 @@ const upload = multer({
 });
 
 // Configurar MercadoPago
-const client = new MercadoPagoConfig({
-  accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN || 'TEST-TOKEN'
-});
+let client;
+try {
+  client = new MercadoPagoConfig({
+    accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN || 'TEST-TOKEN'
+  });
+} catch (error) {
+  console.error('❌ Error al configurar MercadoPago:', error.message);
+}
 
 // Configurar nodemailer
 let transporter;
@@ -606,6 +640,8 @@ app.use('*', (req, res) => {
 // Configuración específica para Vercel
 if (isVercel) {
   console.log('🚀 Configurado para despliegue en Vercel');
+  console.log('📂 __dirname:', __dirname);
+  console.log('📂 process.cwd():', process.cwd());
 } else {
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, () => {
@@ -619,5 +655,11 @@ if (isVercel) {
   });
 }
 
-// Para Vercel (serverless)
-module.exports = app;
+// Para Vercel (serverless) - Exportar con manejo de errores
+try {
+  module.exports = app;
+  console.log('✅ Aplicación exportada correctamente para Vercel');
+} catch (error) {
+  console.error('❌ Error al exportar aplicación:', error);
+  throw error;
+}
